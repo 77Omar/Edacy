@@ -9,20 +9,70 @@
 - **Interface** : React avec Tailwind CSS
 
 ## 🛠 Installation
+sudo apt install python3-django
 
 ### Backend (Django)
 
 # Environnement virtuel :
-python -m venv env
+python3 -m venv env
 source env/bin/activate  # Linux/Mac
-env\Scripts\activate     # Windows
+# ou .\env\Scripts\activate pour Windows
 
-# Dépendances :
+# Création du fichier requirements.txt
+echo "django==4.2
+djangorestframework==3.14
+django-cors-headers==4.3
+mysqlclient==2.2
+python-dotenv==1.0
+djangorestframework-simplejwt==5.3" > requirements.txt
+
 pip install -r requirements.txt
 
-#  Base de données :
+# Initialisation du projet
+django-admin startproject backend
+cd backend
+python manage.py startapp api
 
-Configurer MySQL puis modifier settings.py :
+# Configuration critique dans settings.py
+# backend/settings.py
+
+from datetime import timedelta
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+ALLOWED_HOSTS = ["*"]
+
+INSTALLED_APPS = [
+    ...,
+    "api",
+    "rest_framework",
+    "corsheaders",
+]
+
+MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
+    ...
+]
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+}
+
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+
 DATABASES = {
       'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -36,7 +86,9 @@ DATABASES = {
 
 
 # Migrations :
+python manage.py makemigrations
 python manage.py migrate
+python manage.py runserver
 
 #  Lancer le serveur :
 python manage.py runserver
